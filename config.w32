@@ -1,0 +1,13 @@
+// $Id$
+// vim:ft=javascript
+
+// If your extension references something external, use ARG_WITH
+// ARG_WITH("phppoem", "for phppoem support", "no");
+
+// Otherwise, use ARG_ENABLE
+// ARG_ENABLE("phppoem", "enable phppoem support", "no");
+
+if (PHP_PHPPOEM != "no") {
+	EXTENSION("phppoem", "phppoem.c");
+}
+
