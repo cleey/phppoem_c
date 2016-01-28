@@ -96,23 +96,23 @@ static int compile_view(php_stream *stream, char *compile_path){
 
 	//  这个宏会用内核的方式来申请一块内存并将其地址付给 replace_val， 并初始化它的refcount和is_ref两个属性，更棒的是，它不但会自动的处理内存不足问题， 还会在内存中选个最优的位置来申请。
 	MAKE_STD_ZVAL(replace_val);
+	
 	// 开始正则替换
-	content.c = estrndup(content.c, content.len);
-	i = 0;
-	ZVAL_STRINGL(replace_val, replace[i], strlen(replace[i]), 1);
-	//  php_pcre_replace会返回一个malloc内存的result
-	php_printf("content: %s\n", content.c);
-	if( (result = php_pcre_replace(regex[i], strlen(regex[i]), 
-									content.c, content.len, 
-									replace_val, 0,
-									&result_len, -1, NULL TSRMLS_CC)) != NULL ){
-		php_printf("in\n");
-		php_printf("%d, %s, %s\n", i, content.c, result);
-		content.c = result;
-		content.len = result_len;
-	}else{
-		php_printf("danger\n");
-		php_printf("%s\n",result);
+	for (i = 0; i < REGEX_LEN; i++){
+		ZVAL_STRINGL(replace_val, replace[i], strlen(replace[i]), 1);
+		//  php_pcre_replace会返回一个malloc内存的result
+		if( (result = php_pcre_replace(regex[i], strlen(regex[i]), 
+										content.c, content.len, 
+										replace_val, 0,
+										&result_len, -1, NULL TSRMLS_CC)) != NULL ){
+			php_printf("in\n");
+			php_printf("%s\n",result);
+			content.c = result;
+			content.len = result_len;
+		}else{
+			php_printf("danger\n");
+			php_printf("%s\n",result);
+		}
 	}
 
 	php_printf("end---");
