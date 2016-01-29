@@ -59,5 +59,5 @@ if test "$PHP_PHPPOEM" != "no"; then
   dnl
   dnl PHP_SUBST(PHPPOEM_SHARED_LIBADD)
 
-  PHP_NEW_EXTENSION(phppoem, phppoem.c, $ext_shared)
+  PHP_NEW_EXTENSION(phppoem, phppoem.c, poem_view.c, $ext_shared)
 fi

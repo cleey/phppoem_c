@@ -8,6 +8,6 @@
 // ARG_ENABLE("phppoem", "enable phppoem support", "no");
 
 if (PHP_PHPPOEM != "no") {
-	EXTENSION("phppoem", "phppoem.c");
+	EXTENSION("phppoem", "phppoem.c", "poem_view.c");
 }
 

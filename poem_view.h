@@ -18,45 +18,25 @@
 
 /* $Id$ */
 
-#ifndef PHP_PHPPOEM_H
-#define PHP_PHPPOEM_H
+#ifndef PHP_POEM_VIEW_H
+#define PHP_POEM_VIEW_H
 
-extern zend_module_entry phppoem_module_entry;
-#define phpext_phppoem_ptr &phppoem_module_entry
 
-#define FETCH_THIS Z_OBJCE_P(getThis()), getThis()
-#define POEM_GO(module) PHP_MINIT(poem_##module)(INIT_FUNC_ARGS_PASSTHRU)
-#define POEM_GO_MF(module) PHP_MINIT_FUNCTION(poem_##module)
+#define REGEX_LEN 1
+#define STORE_EG_ENVIRON()\
+{\
+  zval ** __old_return_value_pp = EG(return_value_ptr_ptr);\
+  zend_op ** __old_opline_ptr   = EG(opline_ptr);\
+  zend_op_array * __old_op_array= EG(active_op_array);
 
-#define PHP_PHPPOEM_VERSION "0.1.0" /* Replace with version number for your extension */
-
-#ifdef PHP_WIN32
-#	define PHP_PHPPOEM_API __declspec(dllexport)
-#elif defined(__GNUC__) && __GNUC__ >= 4
-#	define PHP_PHPPOEM_API __attribute__ ((visibility("default")))
-#else
-#	define PHP_PHPPOEM_API
+#define RESTORE_EG_ENVIRON()\
+  EG(return_value_ptr_ptr) = __old_return_value_pp;\
+  EG(opline_ptr) = __old_opline_ptr;\
+  EG(active_op_array) = __old_op_array;\
+}
 #endif
 
-#ifdef ZTS
-#include "TSRM.h"
-#endif
-
-#ifdef ZTS
-#define PHPPOEM_G(v) TSRMG(phppoem_globals_id, zend_phppoem_globals *, v)
-#else
-#define PHPPOEM_G(v) (phppoem_globals.v)
-#endif
-
-#endif	/* PHP_PHPPOEM_H */
-PHP_MINIT_FUNCTION(phppoem);
-PHP_MSHUTDOWN_FUNCTION(phppoem);
-PHP_RINIT_FUNCTION(phppoem);
-PHP_RSHUTDOWN_FUNCTION(phppoem);
-PHP_MINFO_FUNCTION(phppoem);
-
-
-
+POEM_GO_MF(view);
 
 /*
  * Local variables:
