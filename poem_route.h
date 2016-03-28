@@ -18,27 +18,23 @@
 
 /* $Id$ */
 
-#ifndef PHP_POEM_VIEW_H
-#define PHP_POEM_VIEW_H
+#ifndef PHP_POEM_ROUTE_H
+
+#define PHP_POEM_ROUTE_H
+
+#define POEM_G_VARS_TYPE            unsigned int
+#define POEM_G_VARS_POST            TRACK_VARS_POST
+#define POEM_G_VARS_GET             TRACK_VARS_GET
+#define POEM_G_VARS_ENV             TRACK_VARS_ENV
+#define POEM_G_VARS_FILES           TRACK_VARS_FILES
+#define POEM_G_VARS_SERVER          TRACK_VARS_SERVER
+#define POEM_G_VARS_REQUEST         TRACK_VARS_REQUEST
+#define POEM_G_VARS_COOKIE          TRACK_VARS_COOKIE
 
 
-#define REGEX_LEN 1
-#define STORE_EG_ENVIRON()\
-{\
-  zval ** __old_return_value_pp = EG(return_value_ptr_ptr);\
-  zend_op ** __old_opline_ptr   = EG(opline_ptr);\
-  zend_op_array * __old_op_array= EG(active_op_array);
-
-#define RESTORE_EG_ENVIRON()\
-  EG(return_value_ptr_ptr) = __old_return_value_pp;\
-  EG(opline_ptr) = __old_opline_ptr;\
-  EG(active_op_array) = __old_op_array;\
-}
-  
 #endif
 
-
-POEM_GO_MF(view);
+POEM_GO_MF(route);
 
 /*
  * Local variables:

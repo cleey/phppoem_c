@@ -16,17 +16,21 @@
   +----------------------------------------------------------------------+
 */
 
+/* $Id$ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "php.h"
 #include "php_ini.h"
+
 #include "ext/standard/info.h"
 #include "ext/standard/php_smart_str.h"  
 #include "ext/standard/php_filestat.h"
 
 #include "main/php_streams.h"
+
 
 #include "php_phppoem.h"
 #include "poem_view.h"
@@ -173,6 +177,7 @@ static void poew_view_exec_view(zend_file_handle *file_handle, zval *assign) {
 		if( !EG(active_op_array) ){ zend_rebuild_symbol_table(TSRMLS_CC); }
 
 		zend_execute(op_array TSRMLS_CC);
+		destroy_op_array(op_array TSRMLS_CC);
 		efree(op_array);
 
 		if( !EG(exception) ){
