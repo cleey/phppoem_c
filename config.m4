@@ -7,14 +7,14 @@ dnl without editing.
 
 dnl If your extension references something external, use with:
 
-dnl PHP_ARG_WITH(phppoem, for phppoem support,
+PHP_ARG_WITH(phppoem, for phppoem support,
 dnl Make sure that the comment is aligned:
-dnl [  --with-phppoem             Include phppoem support])
+[  --with-phppoem             Include phppoem support])
 
 dnl Otherwise use enable:
 
 PHP_ARG_ENABLE(phppoem, whether to enable phppoem support,
-Make sure that the comment is aligned:
+dnl Make sure that the comment is aligned:
 [  --enable-phppoem           Enable phppoem support])
 
 if test "$PHP_PHPPOEM" != "no"; then
@@ -59,5 +59,5 @@ if test "$PHP_PHPPOEM" != "no"; then
   dnl
   dnl PHP_SUBST(PHPPOEM_SHARED_LIBADD)
 
-  PHP_NEW_EXTENSION(phppoem, phppoem.c, poem_view.c, $ext_shared)
+  PHP_NEW_EXTENSION(phppoem, phppoem.c poem_route.c poem_view.c, $ext_shared)
 fi
