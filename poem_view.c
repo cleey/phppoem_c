@@ -31,7 +31,7 @@
 
 #include "main/php_streams.h"
 
-
+#include "ext/pcre/php_pcre.h"
 #include "php_phppoem.h"
 #include "poem_view.h"
 
@@ -71,13 +71,21 @@ static int poew_view_compile_view(php_stream *stream, char *compile_path){
 	int  result_len, i;
 
 	char regex[REGEX_LEN][100] = {
-		// "/{\\$([\\w\\[\\]\\'\"\$]+)}/s"
-		// "/\\{(\\$[a-zA-Z0-9_\\[\\]'\"\$\\x7f-\\xff]+)\\}/s"
+		// "/\\{\\:(.*)\$\\}/s", // {:func($vo['info'])}
+		"/\\<if\\s+(.+?)\\>/is",
+		"/\\<elseif\\s+(.+?)\\>/is",
+		"/\\<else \\/\\>/is",
+		"/\\<\\/if\\>/is",
+		"/\\{(\\$[\\w\\[\\]'\"\$]+)\\}/s", // {$helo}
 		"/h/s"
 	};
 	char replace[REGEX_LEN][100] = {
-		// "<?php echo \\1; ?>"
-		// "<?php echo htmlspecialchars(\\1, ENT_COMPAT);?>"
+		// "<?php echo '\\1'; ?>",
+		"<?php if(\\1) { ?>",
+		"<?php } elseif(\\1) { ?>",
+		"<?php } else { ?>",
+		"<?php } ?>",
+		"<?php echo \\1; ?>",
 		"hi"
 	};
 
@@ -89,31 +97,25 @@ static int poew_view_compile_view(php_stream *stream, char *compile_path){
 		smart_str_appends(&content, buf);
 	}
 	php_stream_close(stream);
-	// smart_str_0(&content); //  如果字符串存在，给字符串的最后添加’\0’;
+	smart_str_0(&content); //  如果字符串存在，给字符串的最后添加’\0’;
 
 	//  这个宏会用内核的方式来申请一块内存并将其地址付给 replace_val， 并初始化它的refcount和is_ref两个属性，更棒的是，它不但会自动的处理内存不足问题， 还会在内存中选个最优的位置来申请。
-	result = content.c;
-	
-	// MAKE_STD_ZVAL(replace_val);
-	// 开始正则替换
-	// for (i = 0; i < REGEX_LEN; i++){
-	// 	ZVAL_STRINGL(replace_val, replace[i], strlen(replace[i]), 1);
-	// 	//  php_pcre_replace会返回一个malloc内存的result
-	// 	if( (result = php_pcre_replace(regex[i], strlen(regex[i]), 
-	// 									content.c, content.len, 
-	// 									replace_val, 0,
-	// 									&result_len, -1, NULL TSRMLS_CC)) != NULL ){
-	// 		php_printf("in\n");
-	// 		php_printf("%s\n",result);
-	// 		content.c = result;
-	// 		content.len = result_len;
-	// 	}else{
-	// 		php_printf("danger\n");
-	// 		php_printf("%s\n",result);
-	// 	}
-	// }
+	MAKE_STD_ZVAL(replace_val);
+	// result = content.c;
 
-	// php_printf("end---");
+	// 开始正则替换
+	for (i = 0; i < REGEX_LEN; i++){
+		ZVAL_STRINGL(replace_val, replace[i], strlen(replace[i]), 1);
+		//  php_pcre_replace会返回一个malloc内存的result
+		if( (result = php_pcre_replace(regex[i], strlen(regex[i]), 
+										content.c, content.len, 
+										replace_val, 0,
+										&result_len, -1, NULL TSRMLS_CC)) != NULL ){
+			content.c = result;
+			content.len = result_len;
+		}
+	}
+
 	if( result == NULL ){
 		zend_error(E_WARNING, "%s compiler is failed", compile_path);
 		result = content.c;
@@ -222,7 +224,7 @@ static void poew_view_display(INTERNAL_FUNCTION_PARAMETERS, int is_obstart){
 	// 模板路径
 	smart_str_appendl(&template_path, Z_STRVAL_P(template_dir), Z_STRLEN_P(template_dir));
 	smart_str_appendl(&template_path, Z_STRVAL_P(tpl), Z_STRLEN_P(tpl));
-	smart_str_appendl(&template_path, ".tpl", 4);
+	smart_str_appendl(&template_path, ".html", 5);
 	smart_str_0(&template_path);
 
 	// 验证模板文件存在
